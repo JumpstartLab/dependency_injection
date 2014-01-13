@@ -4,9 +4,7 @@ require 'json'
 module ArticleFeed
   class Feed
     def first_article
-      response = Faraday.get("http://localhost:3000/api/v1/articles.json").body
-      data = JSON.parse(response)
-      Article.new(data.first)
+      ArticleStore.new.first
     end
   end
 
@@ -19,10 +17,35 @@ module ArticleFeed
     end
 
     def word_count
-      response = Faraday.get("http://localhost:3000/api/v1/articles/#{id}.json").body
-      data = JSON.parse(response)
-      body = data["article"]["body"]
       body.split(" ").count
+    end
+
+    def body
+      ArticleStore.new.body_for(id)
+    end
+  end
+
+  class ArticleStore
+    def url_root
+      "http://localhost:3000/api/v1/"
+    end
+
+    def extension
+      ".json"
+    end
+
+    def first
+      data = fetch_data("articles")
+      Article.new(data.first)
+    end
+
+    def body_for(id)
+      data = fetch_data("articles/#{id}")
+      body = data["article"]["body"]
+    end
+
+    def fetch_data(path)
+      JSON.parse( Faraday.get(url_root + path + extension).body )
     end
   end
 end
