@@ -5,8 +5,8 @@ module ArticleFeed
   class Feed
     attr_reader :data_store
 
-    def initialize(input_data_store = nil)
-      @data_store = (input_data_store || ArticleStore).new
+    def initialize(input_data_store = ArticleStore)
+      @data_store = input_data_store.new
     end
 
     def first_article

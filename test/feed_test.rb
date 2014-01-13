@@ -4,10 +4,6 @@ require 'minitest/pride'
 require './lib/article_feed/feed'
 
 class FeedTest < Minitest::Test
-  def test_it_exists
-    assert ArticleFeed::Feed
-  end
-
   class FakeDataSource
     def fetch(path)
       if path == "articles"
@@ -24,20 +20,23 @@ class FeedTest < Minitest::Test
     end
   end
 
+  attr_reader :feed
+
+  def setup
+    @feed = ArticleFeed::Feed.new(FakeArticleStore)
+  end
+
   def test_first_article_is_first_in_the_data_store
-    feed = ArticleFeed::Feed.new( FakeArticleStore )
     expected = "Qui Ipsa Maiores Iusto Eligendi Aut 0"
     assert_equal expected, feed.first_article.title
   end
 
   def test_it_finds_the_first_article
     expected_title = "Qui Ipsa Maiores Iusto Eligendi Aut 0"
-    feed = ArticleFeed::Feed.new(FakeArticleStore)
     assert_equal expected_title, feed.first_article.title
   end
 
   def test_it_finds_the_first_article_word_count
-    feed = ArticleFeed::Feed.new(FakeArticleStore)
     first_article = feed.first_article
     assert_equal 26, first_article.word_count
   end
